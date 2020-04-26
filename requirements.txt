@@ -1,0 +1,4 @@
+# Required modules for Office Monitor APP
+Flask==1.1.1
+Flask-SQLAlchemy==2.4.1
+gunicorn==20.0.4
