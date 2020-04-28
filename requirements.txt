@@ -1,4 +1,10 @@
-# Required modules for Office Monitor APP
+# Required modules for Office Dashboard APP
 Flask==1.1.1
+Flask-WTF==0.14.3
 Flask-SQLAlchemy==2.4.1
+Flask-Login==0.5.0
+Flask-Script==2.0.6
+wtforms-validators==1.0.0
+seaborn==0.10.0
 gunicorn==20.0.4
+meraki-sdk==1.5.0
