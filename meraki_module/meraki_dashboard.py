@@ -1,12 +1,20 @@
 import json
-from datetime import datetime
+import os
 from meraki_sdk.meraki_sdk_client import MerakiSdkClient
 from meraki_sdk.exceptions.api_exception import APIException
 from influxdb import InfluxDBClient
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+logdir = os.path.normpath(os.path.join(basedir, "../logs/"))
+os.chdir('../')
+
+import credentials
+
+################################################################
+###    Connect to DB
+################################################################
 # Start influxDB Client
 client = InfluxDBClient(host='localhost', port=8086)
-#client.drop_database('meraki')
 # List Databases
 dbs = client.get_list_database()
 # Check if meraki db exists
@@ -18,8 +26,49 @@ for db in dbs:
 if db_status == 0:
     client.create_database('meraki')
 
+#client.drop_database('meraki')
+#client.switch_database('meraki')
+#client.drop_measurement('meraki_location')
+
 ################################################################
-###    Prime Devices Info
+###    Post Primed Data to InfluxDB
+################################################################
+def post_data(data,measurement):
+    body= []
+    item_json = {}
+    item_json["tags"] = {} 
+    item_json["measurement"] = measurement
+    item_json["fields"] = data
+    body.append(item_json)
+    client.write_points(body,database='meraki',time_precision='ms')
+    return
+
+################################################################
+###    Save Data Selection
+################################################################
+def save_data(result,measurement):
+    ### Print to File if save_file parameter is True
+    if credentials.save_file: 
+        # Write to LOG file
+        f= open(os.path.join(logdir, measurement+".log"),"a+")
+        f.write(json.dumps(data)+"\n")
+        f.close()
+    else: ### Post to DB if save_file parameter is False
+        if type(result) is list:
+            for item in result:
+                # Remove Lists before posting
+                item = prime_influx_data(item,measurement)
+                # Save to DB
+                post_data(item,measurement)
+        else:
+            # Remove Lists before posting
+            item = prime_influx_data(result,measurement)
+            # Save to DB
+            post_data(item,measurement)     
+    return
+
+################################################################
+###    Prime DATA
 ################################################################
 def prime_devices(item):
     if str(item["model"]).startswith("MR"):
@@ -35,9 +84,6 @@ def prime_devices(item):
     
     return (item)
 
-################################################################
-###    Prime Air Marshal Information
-################################################################
 def prime_air_marshal(item):
     bssids_count = len(item["bssids"])
     channels_count = len(item["channels"])
@@ -53,13 +99,12 @@ def prime_air_marshal(item):
 
     return (item)
 
-
 ################################################################
 ###    Influxdb does not accept lists in the field field.
 ###    Delete all Lists from JSON prior to Post to Influx.
 ################################################################
 def prime_influx_data(item,measurement):
-    # Format item to be able to filter in Grafana
+    # Format items to be able to filter in Grafana
     item_string = json.dumps(item)
     clean_item = item_string.replace(': true,',': "OK",').replace(': false,',': "NOK",').replace(': true}',': "OK"}').replace(': false}',': "NOK"}')
     item = json.loads(clean_item)
@@ -88,138 +133,61 @@ def prime_influx_data(item,measurement):
     return (item)
 
 ################################################################
-###    Post info to DB
+###    Collect Dashboard Information
 ################################################################
-def meraki_post_to_db(result,measurement):
-
-    if type(result) is list:
-        for item in result:
-            # Remove Lists before posting
-            item = prime_influx_data(item,measurement)
-
-            body= []
-            item_json = {}
-            item_json["tags"] = {} 
-            item_json["measurement"] = measurement
-            item_json["fields"] = item
-            body.append(item_json)
-            client.write_points(body,database='meraki',time_precision='ms')
-
-    else:
-        # Remove Lists before posting
-        item = prime_influx_data(result,measurement)
-        
-        body = []
-        body_json = {}
-        body_json["measurement"] = measurement
-        body_json["tags"] = {}
-        body_json["fields"] = item
-        body.append(body_json)
-        client.write_points(body,database='meraki',time_precision='ms')    
-    
-    return
-
 def find_meraki_dashboard_info(meraki):
-    params = {}
     # Collect Organization
     orgs = meraki.organizations.get_organizations()[0]
-    params["organization_id"] = str(orgs["id"])
+    params = {"organization_id": orgs["id"]}
     
     # Collect Organization Networks
     nets = meraki.networks.get_organization_networks(params)
-    # Print reult to Screen
-    #print(nets)
-    # Post reult to DB
-    meraki_post_to_db(nets,"networks")
-
-    for network in nets:
-        if network["type"] == "combined":
-            # Collect Floor plans
-            floor_plan = meraki.floorplans.get_network_floor_plans(network["id"])
-            # Print reult to Screen
-            #print(floor_plan)
-            # Post reult to DB
-            meraki_post_to_db(floor_plan,"floor_plan")
-
+    save_data(nets,"networks")            
     # Collect Organization Devices
     devices = meraki.devices.get_organization_devices(params)
-    # Print reult to Screen
-    #print(devices)
-    # Post reult to DB
-    meraki_post_to_db(devices,"devices")
-    
+    save_data(devices,"devices")    
     # Collect Organization Devices Statues
     devices_status = meraki.organizations.get_organization_device_statuses(orgs["id"])
-    # Print reult to Screen
-    #print(devices_status)
-    # Post reult to DB
-    meraki_post_to_db(devices_status,"devices_status")
+    save_data(devices_status,"devices_status")
 
-    # Find Conmined Networks
+    # Find Combined Networks
     for network in nets:
         if network["type"] == "combined":
-            params_clients = {}
-            params_clients['network_id'] = network["id"]
+            # Collect Network SSIDs
             ssids = meraki.ssids.get_network_ssids(network["id"])
-            # Print reult to Screen
-            #print(ssids)
-            # Post reult to DB
-            meraki_post_to_db(ssids,"ssids")
-    
+            save_data(ssids,"ssids")
+            # Collect Network SSIDs
+            floor_plan = meraki.floorplans.get_network_floor_plans(network["id"])
+            save_data(floor_plan,"floor_plan")
+                
     print ("Posted DASHBOARD.")
-    
     return
 
+################################################################
+###    Collect Client Information
+################################################################
 def find_meraki_client_info(meraki):
-    params = {}
     # Collect Organization
     orgs = meraki.organizations.get_organizations()[0]
-    params["organization_id"] = str(orgs["id"])
-
+    params = {"organization_id": orgs["id"]}
     # Collect Organization Networks
     nets = meraki.networks.get_organization_networks(params)
-    # Collect Organization Devices
-    devices = meraki.devices.get_organization_devices(params)
     
-    # Find Cameras
-    for device in devices:
-        if device["model"].startswith("MV"):
-            collect = {}
-            collect['serial'] = device["serial"]
-            # Collect people count now
-            camera_people = meraki.mv_sense.get_device_camera_analytics_live(device["serial"])
-            # Collect Camera Analytics from past hour
-            camera_entrance = meraki.mv_sense.get_device_camera_analytics_overview(collect)
-
     # Find Network Information
     for network in nets:
         if network["type"] == "combined":
-            params_clients = {}
-            params_clients['network_id'] = network["id"]
-            
+            params_clients = {"network_id": network["id"]}
+            params_timespan = {"network_id": network["id"], "timespan": "7200"}
+
             # Collect All Wired/Wireless Clients
             wifi_clients = meraki.clients.get_network_clients(params_clients)
-            # Print result to Screen
-            #print(devices_status)
-            # Post reult to DB
-            meraki_post_to_db(wifi_clients,"wifi_clients")
-
+            save_data(wifi_clients,"wifi_clients")
             # Collect All Bluethoot Clients
             ble_clients = meraki.bluetooth_clients.get_network_bluetooth_clients(params_clients)
-            # Print result to Screen
-            #print(devices_status)
-            # Post reult to DB
-            meraki_post_to_db(ble_clients,"ble_clients")
-
+            save_data(ble_clients,"ble_clients")
             # Collect AirMarshal Wireleass Information
-            air_marshal = meraki.networks.get_network_air_marshal(params_clients)
-            # Print result to Screen
-            #print(devices_status)
-            # Post reult to DB
-            meraki_post_to_db(air_marshal,"air_marshal")
+            air_marshal = meraki.networks.get_network_air_marshal(params_timespan)
+            save_data(air_marshal,"air_marshal")
 
-
-    
     print ("Posted CLIENTS.")
-
     return
