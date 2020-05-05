@@ -107,23 +107,21 @@ def save_meraki_location(request,validator,credentials):
         if validator != credentials.meraki_validator:
             print("validator invalid:", validator)
             return ("invalid validator", 403)
-        else:
-            print("validator verified: ", validator)
+
         ### Verify secret
         if locationdata["secret"] != credentials.meraki_secret:
             print("secret invalid:", locationdata["secret"])
             return ("invalid secret", 403)
-        else:
-            print("secret verified: ", locationdata["secret"])
+
         # Verify version
         if locationdata["version"] != credentials.meraki_version:
             print("invalid version")
             return ("invalid version", 400)
-        else:
-            print("version verified: ", locationdata["version"])
+
         # Save data
         save_data(locationdata,"meraki_location")
         # Return success message
+        print("Posted LOCATION.")
         return "Location Scanning POST Received"
 
     else:

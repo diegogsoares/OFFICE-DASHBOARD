@@ -57,63 +57,52 @@ def save_data(result,measurement):
         if type(result) is list:
             for item in result:
                 # Remove Lists before posting
-                item = prime_influx_data(item,measurement)
+                item = prime_meraki_dashboard(item,measurement)
                 # Save to DB
                 post_data(item,measurement)
         else:
             # Remove Lists before posting
-            item = prime_influx_data(result,measurement)
+            item = prime_meraki_dashboard(result,measurement)
             # Save to DB
             post_data(item,measurement)     
     return
 
 ################################################################
-###    Prime DATA
-################################################################
-def prime_devices(item):
-    if str(item["model"]).startswith("MR"):
-        item["devicetype"] = "AP"
-    elif str(item["model"]).startswith("MV"):
-        item["devicetype"] = "CAMERA"
-    elif str(item["model"]).startswith("MS"):
-        item["devicetype"] = "SWITCH"
-    elif str(item["model"]).startswith("MX"):
-        item["devicetype"] = "FIREWALL"
-    else:
-        item["devicetype"] = "OTHER"
-    
-    return (item)
-
-def prime_air_marshal(item):
-    bssids_count = len(item["bssids"])
-    channels_count = len(item["channels"])
-    rssi = 0
-    for bssid in item["bssids"]:
-        for device in bssid["detectedBy"]:
-            if device["rssi"] >= rssi:
-                rssi = device["rssi"]
-
-    item["bssids_count"] = bssids_count
-    item["channels_count"] = channels_count
-    item["hih_rssi"] = rssi
-
-    return (item)
-
-################################################################
 ###    Influxdb does not accept lists in the field field.
 ###    Delete all Lists from JSON prior to Post to Influx.
 ################################################################
-def prime_influx_data(item,measurement):
+def prime_meraki_dashboard(item,measurement):
     # Format items to be able to filter in Grafana
     item_string = json.dumps(item)
     clean_item = item_string.replace(': true,',': "OK",').replace(': false,',': "NOK",').replace(': true}',': "OK"}').replace(': false}',': "NOK"}')
     item = json.loads(clean_item)
     
     if measurement == "devices":
-        item = prime_devices(item)
+        if str(item["model"]).startswith("MR"):
+            item["devicetype"] = "AP"
+        elif str(item["model"]).startswith("MV"):
+            item["devicetype"] = "CAMERA"
+        elif str(item["model"]).startswith("MS"):
+            item["devicetype"] = "SWITCH"
+        elif str(item["model"]).startswith("MX"):
+            item["devicetype"] = "FIREWALL"
+        else:
+            item["devicetype"] = "OTHER"
+
     elif measurement == "air_marshal":
-        item = prime_air_marshal(item)
+        bssids_count = len(item["bssids"])
+        channels_count = len(item["channels"])
+        rssi = 0
+        for bssid in item["bssids"]:
+            for device in bssid["detectedBy"]:
+                if device["rssi"] >= rssi:
+                    rssi = device["rssi"]
+
+        item["bssids_count"] = bssids_count
+        item["channels_count"] = channels_count
+        item["high_rssi"] = rssi
     
+
     del_dict_keys = []
     for key in item:
         if type(item[key]) is dict:
@@ -185,7 +174,7 @@ def find_meraki_client_info(meraki):
             # Collect All Bluethoot Clients
             ble_clients = meraki.bluetooth_clients.get_network_bluetooth_clients(params_clients)
             save_data(ble_clients,"ble_clients")
-            # Collect AirMarshal Wireleass Information
+            # Collect AirMarshal Wireless Information
             air_marshal = meraki.networks.get_network_air_marshal(params_timespan)
             save_data(air_marshal,"air_marshal")
 

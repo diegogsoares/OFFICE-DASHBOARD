@@ -2,5 +2,8 @@ __pycache__
 *.pyc
 *.log
 *.db
+*.jpg
+*.jpeg
+*.tmp
 credentials.py
 venv/

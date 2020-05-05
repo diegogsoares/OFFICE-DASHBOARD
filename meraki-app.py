@@ -1,6 +1,10 @@
 from flask import Flask
 from flask import render_template, url_for,request,redirect,flash,send_file
 from flask_apscheduler import APScheduler
+from meraki_sdk.meraki_sdk_client import MerakiSdkClient
+from meraki_sdk.exceptions.api_exception import APIException
+import random, time
+
 
 import credentials
 from meraki_module.meraki_dashboard import *
@@ -18,6 +22,10 @@ class Config(object):
             'id': 'job2',
             'func': 'meraki-app:collect_meraki_client_info', 'args': (),
             'trigger': 'interval', 'seconds': 30
+        },{
+            'id': 'job3',
+            'func': 'meraki-app:collect_camera_data', 'args': (),
+            'trigger': 'interval', 'seconds': 30
         }
     ]
     SCHEDULER_API_ENABLED = True
@@ -27,6 +35,7 @@ class Config(object):
 ################################################################
 #Collect Information from Meraki Dashboad
 def collect_meraki_dashboard_info():
+    time.sleep(random.randint(0, 6))
     # Initialize Meraki SDK
     meraki = MerakiSdkClient(credentials.meraki_api_dashboard_key)
     # Find Dashboard Base Information
@@ -37,6 +46,7 @@ def collect_meraki_dashboard_info():
 
 #Collect Client Information from Meraki Dashboad
 def collect_meraki_client_info():
+    time.sleep(random.randint(0, 4))
     # Initialize Meraki SDK
     meraki = MerakiSdkClient(credentials.meraki_api_dashboard_key)
     # Find Dashboard Base Information
@@ -45,6 +55,16 @@ def collect_meraki_client_info():
 
     return
 
+#Collect Client Information from Meraki Dashboad
+def collect_camera_data():
+    time.sleep(random.randint(0, 2))
+    # Initialize Meraki SDK
+    meraki = MerakiSdkClient(credentials.meraki_api_dashboard_key)
+    # Find Dashboard Base Information
+    # Orgs, Networks, Devices, SSIDs
+    find_camera_data(meraki)
+
+    return
 ################################################################
 ###     Define FLASK APP
 ################################################################

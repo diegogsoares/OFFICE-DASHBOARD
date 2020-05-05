@@ -1,5 +1,4 @@
-import json
-import os
+import boto3, urllib, json, os, requests, wget, time
 from meraki_sdk.meraki_sdk_client import MerakiSdkClient
 from meraki_sdk.exceptions.api_exception import APIException
 from influxdb import InfluxDBClient
@@ -28,7 +27,7 @@ if db_status == 0:
 
 #client.drop_database('meraki')
 #client.switch_database('meraki')
-#client.drop_measurement('meraki_location')
+#client.drop_measurement('rekognition_face')
 
 ################################################################
 ###    Post Primed Data to InfluxDB
@@ -57,51 +56,98 @@ def save_data(result,measurement):
         if type(result) is list:
             for item in result:
                 # Remove Lists before posting
-                item = prime_meraki_sense(item)
+                item = prime_meraki_sense(item,measurement)
                 # Save to DB
-                post_data(item,measurement)
+                if item:
+                    post_data(item,measurement)
         else:
             # Remove Lists before posting
-            item = prime_meraki_sense(result)
+            item = prime_meraki_sense(result,measurement)
             # Save to DB
-            post_data(item,measurement)     
+            if item:
+                post_data(item,measurement)     
     return
 
 ################################################################
 ###    Prime DATA
+###    Remove nested data
 ################################################################
 def prime_meraki_sense(result,measurement):
-  
-    return
+    # Prime Camera Analytics
+    if measurement == "camera_people":
+        for key1 in result["zones"].keys():
+            for key2 in result["zones"][key1].keys():
+                result["zones_"+key1+"_"+key2] = result["zones"][key1][key2]
+        
+        del result["zones"]
+
+    # Prime AWS Rekognition FACE_DETECT
+    elif measurement == "rekognition_face":
+        rekognition_result = {}
+        face_attributes = ["AgeRange", "Smile", "Eyeglasses", "Gender", "Emotions", "Confidence"]
+
+        for key1 in result.keys():
+            if key1 in set(face_attributes):
+                if type(result[key1]) is list:
+                    for item2 in result[key1]:
+                        rekognition_result["emotion_"+item2["Type"]+"_confidence"] = item2["Confidence"]
+                elif type(result[key1]) is dict:
+                    for key2 in result[key1].keys():
+                        rekognition_result[key1+"_"+key2] = result[key1][key2]
+                else:
+                    rekognition_result[key1] = result[key1]
+
+        return rekognition_result
+    
+    # Prime AWS Rekognition FACE_DETECT
+    elif measurement == "rekognition_objects":
+        rekognition_result = {}
+        if len(result["Instances"]) != 0:
+            rekognition_result["object_count"] = len(result["Instances"])       
+            rekognition_result["object_name"] = result["Name"]
+            rekognition_result["object_confidence"] = result["Confidence"]
+            return rekognition_result
+        else:
+            return
+
+    return result
 
 ################################################################
-###    Collect MV Sense Information
+###    Analyze Snapshoot
 ################################################################
-def collect_camera_data(meraki):
-    # Collect Organization
-    orgs = meraki.organizations.get_organizations()[0]
-    params["organization_id"] = str(orgs["id"])
-    # Collect Organization Networks
-    nets = meraki.networks.get_organization_networks(params)
+def analyze_snapshot(url):
+    
+    # Get Meraki Snapshot Image
+    response_code = 0
+    while response_code != 200:
+        time.sleep(1)
+        imgbytes = requests.get(url, allow_redirects=True)
+        response_code = imgbytes.status_code
 
-    # Find Cameras
-    for network in nets:
-        if network["type"] == "combined":
-            params = {"network_id": network["id"]}
-            devices  = meraki.devices.get_network_devices(params)
-            for device in devices:
-                if device["model"].startswith("MV"):
-                    collect = {"serial": device["serial"]} 
-                    param_snapshot = {"serial": device["serial"], "network_id": network["id"]}
-                    # Collect people count now
-                    camera_people = meraki.mv_sense.get_device_camera_analytics_live(device["serial"])
-                    save_data(camera_people,"camera_people")
-                    # Collect Camera Analytics from past hour
-                    camera_entrance = meraki.mv_sense.get_device_camera_analytics_recent(device["serial"])
-                    save_data(camera_people,"camera_entrance")
-                    # Collect Camera snapshot
-                    camera_entrance = meraki.cameras.generate_network_camera_snapshot(param_snapshot)
-                    save_data(camera_people,"camera_entrance")
+    # Create an AWS Session to post on image analytics service
+    session = boto3.Session(credentials.aws_access_key_id,credentials.aws_secret_access_key)
+    client = session.client('rekognition',credentials.aws_region)
+
+    # Get analytics on face detection
+    try:
+        face_response = client.detect_faces(Image={'Bytes': imgbytes.content}, Attributes=['ALL'])
+        
+        for item in face_response["FaceDetails"]:
+            save_data(item,"rekognition_face")
+    except:
+        print("FACE DETECTION FAILED")
+        pass
+
+    # Get analytics on image objects
+    try:
+        label_response = client.detect_labels(Image={'Bytes': imgbytes.content},MaxLabels=10,MinConfidence=90)
+        
+        for item in label_response["Labels"]:
+            save_data(item,"rekognition_objects")
+    except:
+        print("LABEL DETECTION FAILED")
+        pass
+        
 
     return
 
@@ -109,8 +155,42 @@ def collect_camera_data(meraki):
 ###    Analyze MV Sense Alert
 ################################################################
 def analyze_camera_alert(data):
+    # If using Motion recap
+    if data.get("alertData").get("imageUrl"):
+        analyze_snapshot(data.get("alertData").get("imageUrl"))
+    else:
+        print("No Alert Data.")
 
-    print(data)
-
+    print ("Posted MV Notification.")
     return ("Alert Posted!")
+
+################################################################
+###    Collect MV Sense Information
+################################################################
+def find_camera_data(meraki):
+    # Collect Organization
+    orgs = meraki.organizations.get_organizations()[0]
+    params = {"organization_id": orgs["id"]}
+
+    # Collect Organization Networks
+    nets = meraki.networks.get_organization_networks(params)
+
+    # Find Cameras
+    for network in nets:
+        if network["type"] == "combined":
+            devices  = meraki.devices.get_network_devices(network["id"])
+            for device in devices:
+                if device["model"].startswith("MV"):
+                    # Collect people count now
+                    camera_people = meraki.mv_sense.get_device_camera_analytics_live(device["serial"])
+                    camera_people["camera_serial"] = device["serial"]
+                    save_data(camera_people,"camera_people")
+                    # Collect Camera Analytics from past hour
+                    camera_entrance = meraki.mv_sense.get_device_camera_analytics_recent({"serial" : device["serial"]})
+                    for item in camera_entrance:
+                        item["camera_serial"] = device["serial"]
+                    save_data(camera_entrance,"camera_entrance")
+    
+    print ("Posted CAMERA.")
+    return
 
