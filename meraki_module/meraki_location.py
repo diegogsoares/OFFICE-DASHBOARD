@@ -56,24 +56,26 @@ def save_data(result,measurement):
                 # Remove Lists before posting
                 item = prime_meraki_location(item)
                 # Save to DB
-                post_data(item,measurement)
+                post_data(item,measurement)   
         else:
             # Remove Lists before posting
-            item = prime_meraki_location(result)
+            item_result = prime_meraki_location(result)
             # Save to DB
-            post_data(item,measurement)     
+            for primed_item in item_result:
+                post_data(primed_item,measurement)
+              
     return
 
 ################################################################
 ###    Prime Location API
 ################################################################
 def prime_meraki_location(locationdata):
+    primed_location = []
 
-    device_location = {}
-    data = locationdata["data"]
-    for key in data.keys():
+    for key in locationdata["data"].keys():
         if key == "observations":
-            for observation in data[key]:
+            for observation in locationdata["data"][key]:
+                device_location = {}
                 for item in observation.keys():
                     if item == "location":
                         device_location["location_lat"] = float(observation["location"]["lat"])
@@ -87,10 +89,10 @@ def prime_meraki_location(locationdata):
                         else:
                             device_location[item] = "EMPTY"
                 device_location["type"] = locationdata["type"]
-                device_location["apMac"] = data["apMac"]
-                device_location["apFloors"] = data["apFloors"][0]
-
-    return (device_location)
+                device_location["apMac"] = locationdata["data"]["apMac"]
+                device_location["apFloors"] = locationdata["data"]["apFloors"][0]
+                primed_location.append(device_location)
+    return (primed_location)
 
 ################################################################
 ###    Validate Location API Data and Save
