@@ -1,15 +1,18 @@
 from flask import Flask
-from flask import render_template, url_for,request,redirect,flash,send_file
+from flask import render_template, url_for,request,redirect,flash,send_file,send_from_directory
 from flask_apscheduler import APScheduler
 from meraki_sdk.meraki_sdk_client import MerakiSdkClient
 from meraki_sdk.exceptions.api_exception import APIException
-import random, time
-
+import random, time, os
+from io import StringIO
+from PIL import Image
 
 import credentials
 from meraki_module.meraki_dashboard import *
 from meraki_module.meraki_location import *
 from meraki_module.meraki_sense import *
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Define a job to run and its frequency
 class Config(object):
@@ -35,7 +38,7 @@ class Config(object):
 ################################################################
 #Collect Information from Meraki Dashboad
 def collect_meraki_dashboard_info():
-    time.sleep(random.randint(0, 6))
+    time.sleep(random.randint(0, 2))
     # Initialize Meraki SDK
     meraki = MerakiSdkClient(credentials.meraki_api_dashboard_key)
     # Find Dashboard Base Information
@@ -46,7 +49,7 @@ def collect_meraki_dashboard_info():
 
 #Collect Client Information from Meraki Dashboad
 def collect_meraki_client_info():
-    time.sleep(random.randint(0, 4))
+    time.sleep(random.randint(0, 2))
     # Initialize Meraki SDK
     meraki = MerakiSdkClient(credentials.meraki_api_dashboard_key)
     # Find Dashboard Base Information
@@ -96,11 +99,31 @@ def alert():
 
     return (result)
 
+# OAUTH View
+@app.route('/oauth', methods=['GET', 'POST'])
+def oauth():
+
+    print(request.args)
+
+    return ("OAUTH PAGE!")
+
 # Index View
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
     return ("Welcome to Meraki APP!")
+
+# Image View
+@app.route('/image/<image_file>')
+def image(image_file):
+
+    if os.path.isfile(os.path.join(basedir, "images/"+image_file)):
+        if ".png" in image_file:
+            return send_file(os.path.join(basedir, "images/"+image_file), mimetype="image/png", cache_timeout=-1)
+        else:
+            return send_file(os.path.join(basedir, "images/"+image_file), mimetype="image/jpeg", cache_timeout=-1)
+    
+    return ("NOT a valid file!")
 
 ################################################################
 ###    Start APP

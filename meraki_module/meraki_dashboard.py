@@ -1,11 +1,11 @@
-import json
-import os
-from meraki_sdk.meraki_sdk_client import MerakiSdkClient
-from meraki_sdk.exceptions.api_exception import APIException
+import json, os, time, requests
+#from meraki_sdk.meraki_sdk_client import MerakiSdkClient
+#from meraki_sdk.exceptions.api_exception import APIException
 from influxdb import InfluxDBClient
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 logdir = os.path.normpath(os.path.join(basedir, "../logs/"))
+imagedir = os.path.normpath(os.path.join(basedir, "../images/"))
 os.chdir('../')
 
 import credentials
@@ -66,6 +66,20 @@ def save_data(result,measurement):
             # Save to DB
             post_data(item,measurement)     
     return
+
+################################################################
+###    GET Image
+################################################################
+def get_snapshot_image(url):
+    # Get Meraki Snapshot Image
+    response_code = count = 0
+    while response_code != 200 and count <10:
+        image = requests.get(url, allow_redirects=True)
+        response_code = image.status_code
+        count += 1
+        time.sleep(1)
+
+    return image
 
 ################################################################
 ###    Influxdb does not accept lists in the field field.
@@ -146,9 +160,23 @@ def find_meraki_dashboard_info(meraki):
             ssids = meraki.ssids.get_network_ssids(network["id"])
             save_data(ssids,"ssids")
             # Collect Network SSIDs
-            floor_plan = meraki.floorplans.get_network_floor_plans(network["id"])
-            save_data(floor_plan,"floor_plan")
-                
+            floor_plans = meraki.floorplans.get_network_floor_plans(network["id"])
+            save_data(floor_plans,"floor_plan")
+            for floor_plan in floor_plans:
+                image = get_snapshot_image(floor_plan["imageUrl"])
+                f = open(os.path.join(imagedir, floor_plan["floorPlanId"]+".png"), "wb")
+                f.write(image.content)
+                f.close()
+
+            # Get Camera Image
+            for device in devices:
+                if device["model"].startswith("MV") and network["id"] == device["networkId"]:
+                    snapshoot = meraki.cameras.generate_network_camera_snapshot({"network_id": network["id"], "serial" : device["serial"]})
+                    image = get_snapshot_image(snapshoot["url"])
+                    f = open(os.path.join(imagedir, device["serial"]+".jpg"), "wb")
+                    f.write(image.content)
+                    f.close()
+    
     print ("Posted DASHBOARD.")
     return
 

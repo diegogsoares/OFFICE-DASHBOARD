@@ -4,6 +4,7 @@ __pycache__
 *.db
 *.jpg
 *.jpeg
+*.png
 *.tmp
 credentials.py
 venv/

@@ -1,10 +1,9 @@
-import boto3, urllib, json, os, requests, wget, time
-from meraki_sdk.meraki_sdk_client import MerakiSdkClient
-from meraki_sdk.exceptions.api_exception import APIException
+import boto3, json, os, requests, time
 from influxdb import InfluxDBClient
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 logdir = os.path.normpath(os.path.join(basedir, "../logs/"))
+imagedir = os.path.normpath(os.path.join(basedir, "../images/"))
 os.chdir('../')
 
 import credentials
@@ -113,16 +112,24 @@ def prime_meraki_sense(result,measurement):
     return result
 
 ################################################################
-###    Analyze Snapshoot
+###    GET Image
 ################################################################
-def analyze_snapshot(url):
-    
+def get_snapshot_image(url):
     # Get Meraki Snapshot Image
     response_code = 0
     while response_code != 200:
         time.sleep(1)
-        imgbytes = requests.get(url, allow_redirects=True)
-        response_code = imgbytes.status_code
+        image = requests.get(url, allow_redirects=True)
+        response_code = image.status_code
+
+    return image
+
+################################################################
+###    Analyze Snapshoot
+################################################################
+def analyze_snapshot(url):
+    # Get Meraki Snapshot Image
+    imgbytes = get_snapshot_image(url)
 
     # Create an AWS Session to post on image analytics service
     session = boto3.Session(credentials.aws_access_key_id,credentials.aws_secret_access_key)
@@ -190,7 +197,7 @@ def find_camera_data(meraki):
                     for item in camera_entrance:
                         item["camera_serial"] = device["serial"]
                     save_data(camera_entrance,"camera_entrance")
-    
+
     print ("Posted CAMERA.")
     return
 
