@@ -123,7 +123,13 @@ Step 3: Install requirements
 python3 -m pip install -r requirements.txt 
 ```
 
-Step 4: Edit credentials.py file and add your credentials
+Step 4: Copy credentials_example.py to credentials.py so all APP/Module parameters can be configured.
+
+```bash
+cp credentials_example.py credentials.py 
+```
+
+Step 5: Edit credentials.py file and add your credentials
 
 ```bash
 vi credentials.py 
