@@ -8,9 +8,9 @@ from io import StringIO
 from PIL import Image
 
 import credentials
-from meraki_module.meraki_dashboard import *
-from meraki_module.meraki_location import *
-from meraki_module.meraki_sense import *
+from module_meraki.meraki_dashboard import *
+from module_meraki.meraki_location import *
+from module_meraki.meraki_sense import *
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -19,15 +19,15 @@ class Config(object):
     JOBS = [
         {
             'id': 'job1',
-            'func': 'meraki-app:collect_meraki_dashboard_info', 'args': (),
+            'func': 'app:collect_meraki_dashboard_info', 'args': (),
             'trigger': 'interval', 'seconds': 60
         },{
             'id': 'job2',
-            'func': 'meraki-app:collect_meraki_client_info', 'args': (),
+            'func': 'app:collect_meraki_client_info', 'args': (),
             'trigger': 'interval', 'seconds': 30
         },{
             'id': 'job3',
-            'func': 'meraki-app:collect_camera_data', 'args': (),
+            'func': 'app:collect_camera_data', 'args': (),
             'trigger': 'interval', 'seconds': 30
         }
     ]
@@ -52,8 +52,7 @@ def collect_meraki_client_info():
     time.sleep(random.randint(0, 2))
     # Initialize Meraki SDK
     meraki = MerakiSdkClient(credentials.meraki_api_dashboard_key)
-    # Find Dashboard Base Information
-    # Orgs, Networks, Devices, SSIDs
+    # Find Dashboard Base Information: Orgs, Networks, Devices, SSIDs
     find_meraki_client_info(meraki)
 
     return
@@ -63,8 +62,7 @@ def collect_camera_data():
     time.sleep(random.randint(0, 2))
     # Initialize Meraki SDK
     meraki = MerakiSdkClient(credentials.meraki_api_dashboard_key)
-    # Find Dashboard Base Information
-    # Orgs, Networks, Devices, SSIDs
+    # Find Dashboard Base Information: Orgs, Networks, Devices, SSIDs
     find_camera_data(meraki)
 
     return

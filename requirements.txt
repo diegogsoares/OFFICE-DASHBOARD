@@ -8,3 +8,5 @@ wtforms-validators==1.0.0
 seaborn==0.10.0
 gunicorn==20.0.4
 meraki-sdk==1.5.0
+selenium==3.141.0
+python-benedict==0.18.1
