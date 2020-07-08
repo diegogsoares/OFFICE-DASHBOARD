@@ -5,8 +5,7 @@
 OFFICE-DASHBOARD is a WEB Dashboard that allows visualization of Key Metrics (KPIs) of real state utilization (Enterprise Workspaces, Retail Stores and others) leveraging Cisco infrastructure as a Sensor.
 The use of these metrics can help organizations to prioritize/justify investments in real state based on utilization metrics of its spaces, it also can help better understand employee behaviors when it comes to a relly important question, How is my Office being used?
 
-IMAGE of the DASHBOARD
-![Dashboard Sample](dashboard.jpg)
+![Dashboard Sample](dashboard.png)
 
 Example of some metrics:
 
