@@ -117,7 +117,7 @@ def image(image_file):
     #If image does not exist
     return ("NOT a valid file!")
 
-# URL to receive DNA Spaces Notifications posts 
+# DNA Spaces Notifications POST URL 
 @app.route('/dnaspaces-notification/', methods=['GET', 'POST'])
 def dnaspaces_notification():
     if request.method == 'POST':
@@ -126,7 +126,7 @@ def dnaspaces_notification():
     
     return ("DNA Spaces Notification URL.")
 
-# URL to receive Meraki Location posts 
+# Meraki Location POST URL
 @app.route('/location/<validator>', methods=['GET', 'POST'])
 def location(validator):
     t1 = datetime.datetime.now()
@@ -140,7 +140,7 @@ def location(validator):
     #Return result to View Call
     return (message,code)
 
-# Alert View
+# MV Alert POST URL
 @app.route('/mvalert', methods=['GET', 'POST'])
 def alert():
     t1 = datetime.datetime.now()

@@ -6,7 +6,7 @@ OFFICE-DASHBOARD is a WEB Dashboard that allows visualization of Key Metrics (KP
 The use of these metrics can help organizations to prioritize/justify investments in real state based on utilization metrics of its spaces, it also can help better understand employee behaviors when it comes to a relly important question, How is my Office being used?
 
 IMAGE of the DASHBOARD
-![Dashboard Sample](x.jpg)
+![Dashboard Sample](dashboard.jpg)
 
 Example of some metrics:
 
@@ -25,7 +25,7 @@ Written in python it leverages [Flask Framework](https://flask.palletsprojects.c
 Each module has the capability of runninng as a standalone script for testing/troubleshooting scenarios.
 
 IMAGE of the APP Architecture
-![APP Architecture](x.jpg)
+![APP Architecture](app_architecture.jpg)
 
 If you want more details on the _Office Dashboard_ check this **[post](https://netdevopsmadeeasy.com/office-dashboard/)** with detailed explanation.
 
@@ -83,7 +83,7 @@ If you want more details on the _Office Dashboard - Data Retention Module_ check
 - python 3.x
 - pip package manager (https://pip.pypa.io/en/stable/installing/)
 
->**Note:** Check this **[post](https://netdevopsmadeeasy.com/office-dashboard/)** to setup a Linux VM as your development environmennt.
+>**Note:** Check this **[post](https://netdevopsmadeeasy.com/office-dashboard/)** to setup a Linux VM as your development environment.
 
 If already installed, make sure that pip / setuptools are upto date (commands may vary)
 
@@ -220,7 +220,7 @@ See also the list of [contributors] who participated in this project.
 
 ## **License**
 
-This project is licensed under the GPLv2 License - see the [LICENSE]() file for details
+This project is licensed under the GPLv2 License - see the [LICENSE](https://github.com/diegogsoares/OFFICE-DASHBOARD/blob/master/LICENSE) file for details
 
 <br>
 
