@@ -24,8 +24,9 @@ Example of some metrics:
 Written in python it leverages [Flask Framework](https://flask.palletsprojects.com/en/1.1.x/) to handle the induvidual data collection modules and the expose urls for data posting.
 Each module has the capability of runninng as a standalone script for testing/troubleshooting scenarios.
 
-IMAGE of the APP Architecture
 ![APP Architecture](app_architecture.png)
+
+<br>
 
 If you want more details on the _Office Dashboard_ check this **[post](https://netdevopsmadeeasy.com/office-dashboard/)** with detailed explanation.
 
