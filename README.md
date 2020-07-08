@@ -25,7 +25,7 @@ Written in python it leverages [Flask Framework](https://flask.palletsprojects.c
 Each module has the capability of runninng as a standalone script for testing/troubleshooting scenarios.
 
 IMAGE of the APP Architecture
-![APP Architecture](app_architecture.jpg)
+![APP Architecture](app_architecture.png)
 
 If you want more details on the _Office Dashboard_ check this **[post](https://netdevopsmadeeasy.com/office-dashboard/)** with detailed explanation.
 
