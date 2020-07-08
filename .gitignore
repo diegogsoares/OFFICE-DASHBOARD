@@ -9,4 +9,3 @@ __pycache__
 *.tmp
 credentials.py
 venv/
-module_meraki/
