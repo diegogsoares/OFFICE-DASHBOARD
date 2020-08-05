@@ -188,6 +188,8 @@ approximated expected output:
 
 ```console
 Expected output
+Expected output
+Expected output
 ```
 
 #### Testing Webex Module
@@ -199,6 +201,8 @@ Expected output
 approximated expected output:
 
 ```console
+Expected output
+Expected output
 Expected output
 ```
 
@@ -212,6 +216,8 @@ approximated expected output:
 
 ```console
 Expected output
+Expected output
+Expected output
 ```
 
 #### Running OFFICE-DASHBOARD APP
@@ -223,6 +229,8 @@ Expected output
 approximated expected output:
 
 ```console
+Expected output
+Expected output
 Expected output
 ```
 
@@ -250,6 +258,7 @@ none
 - **Diego Soares** - _Initial work_
   - [GITHUB account](https://github.com/diegogsoares) &nbsp;
   - [BLOG netdevopsmadeeasy.com](https://netdevopsmadeeasy.com/about-me/)
+  - [Linkedin Profile](www.linkedin.com/in/diegogsores)
 
 See also the list of [contributors] who participated in this project.
 
