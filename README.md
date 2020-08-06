@@ -187,9 +187,92 @@ nano credentials.py
 approximated expected output:
 
 ```console
-Expected output
-Expected output
-Expected output
+(venv) Linux:OFFICE-DASHBOARD$ python3 modules/meraki.py
+1: Raw JSON
+2: Primed JSON
+Enter a number: 1
+
+#########################
+##### DASHBOARD - networks
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+#########################
+##### DASHBOARD - devices
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+#########################
+##### DASHBOARD - devices_status
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+#########################
+##### DASHBOARD - ssids
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+#########################
+##### DASHBOARD - floor_plan
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+#########################
+##### CLIENT - wifi_clients
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+#########################
+##### CLIENT - ble_clients
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)    }
+]
+#########################
+##### CLIENT - air_marshal
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+#########################
+##### CAMERA - camera_people
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+#########################
+##### CAMERA - camera_entrance
+#########################
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+(venv) Linux:OFFICE-DASHBOARD$ 
+
 ```
 
 #### Testing Webex Module
@@ -215,9 +298,55 @@ Expected output
 approximated expected output:
 
 ```console
-Expected output
-Expected output
-Expected output
+(venv) Linux:OFFICE-DASHBOARD$ python3 modules/dnaspaces.py 
+##############
+##  List of Clients
+##############
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+##############
+##  Summary of Device Types
+##############
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+##############
+##  Device Counts
+##############
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+##############
+##  List of MAP Elements
+##############
+[
+    {
+... (OMITTED FOR BREVITY)
+    }
+]
+##############
+##  List of MAP Images
+##############
+####################
+Name : XXX
+Hierarchy : ['XXXXX']
+Image Name : XXXXX.png
+####################
+Name : XXX
+Hierarchy : ['XXXXX']
+Image Name : XXXXX.png
+
+... (OMITTED FOR BREVITY)
+
+(venv) Linux:OFFICE-DASHBOARD$ 
+
 ```
 
 #### Running OFFICE-DASHBOARD APP
@@ -229,9 +358,41 @@ Expected output
 approximated expected output:
 
 ```console
-Expected output
-Expected output
-Expected output
+(venv) Linux:OFFICE-DASHBOARD$ python3 new-app.py
+ * Serving Flask app "new-app" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+ * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+Webex Devices Info Collected and Saved! - 0:00:00.353255
+Webex Devices Info Collected and Saved! - 0:00:00.448125
+Meraki Clients Info Collected and Saved! - 0:00:01.771385
+Meraki Clients Info Collected and Saved! - 0:00:01.833743
+Meraki Cameras Info Collected and Saved! - 0:00:02.005631
+Meraki Cameras Info Collected and Saved! - 0:00:02.187581
+Webex Devices Info Collected and Saved! - 0:00:00.419774
+Webex Devices Info Collected and Saved! - 0:00:00.436321
+Meraki Clients Info Collected and Saved! - 0:00:01.389558
+Meraki Clients Info Collected and Saved! - 0:00:01.468247
+Meraki Cameras Info Collected and Saved! - 0:00:02.355923
+Meraki Cameras Info Collected and Saved! - 0:00:02.440555
+Webex Devices Info Collected and Saved! - 0:00:00.455844
+Webex Devices Info Collected and Saved! - 0:00:00.456249
+Meraki Dashboard Info Collected and Saved! - 0:00:22.925205
+Meraki Clients Info Collected and Saved! - 0:00:01.331045
+Meraki Clients Info Collected and Saved! - 0:00:01.343255
+Meraki Dashboard Info Collected and Saved! - 0:00:23.679898
+Meraki Cameras Info Collected and Saved! - 0:00:02.045148
+Meraki Cameras Info Collected and Saved! - 0:00:02.287283
+Webex Devices Info Collected and Saved! - 0:00:00.454222
+Webex Devices Info Collected and Saved! - 0:00:00.498706
+Meraki Clients Info Collected and Saved! - 0:00:01.333942
+Meraki Clients Info Collected and Saved! - 0:00:01.372424
+Meraki Cameras Info Collected and Saved! - 0:00:02.014548
+Meraki Cameras Info Collected and Saved! - 0:00:02.369535
+
+... (OMITTED FOR BREVITY)
 ```
 
 <br>
@@ -258,7 +419,7 @@ none
 - **Diego Soares** - _Initial work_
   - [GITHUB account](https://github.com/diegogsoares) &nbsp;
   - [BLOG netdevopsmadeeasy.com](https://netdevopsmadeeasy.com/about-me/)
-  - [Linkedin Profile](www.linkedin.com/in/diegogsores)
+  - [Linkedin Profile](https://www.linkedin.com/in/diegogsores/)
 
 See also the list of [contributors] who participated in this project.
 

@@ -133,17 +133,20 @@ if __name__ == "__main__":
     #Prime data
     clean_list = prime_influx(clients_resp.json().get("results"))
     
-    for item in clean_list:
-        print("################################################################")
-        print(json.dumps(item, sort_keys=True,indent=4, separators=(',', ': ')))
+    #Get Clients
+    print("##############\n##  List of Clients\n##############")
+    #for item in clean_list:
+    #    print(json.dumps(item, sort_keys=True,indent=4, separators=(',', ': ')))
 
-    print("################################################################")
+    #Get Device Types
+    print("##############\n##  Summary of Device Types\n##############")
     print(json.dumps(prime_influx(device_types_resp.json().get("results")), sort_keys=True,indent=4, separators=(',', ': ')))
-    print("################################################################")
+    #Get Device Count
+    print("##############\n##  Device Counts\n##############")
     print(json.dumps(prime_influx(device_perfloor_resp.json().get("results")), sort_keys=True,indent=4, separators=(',', ': ')))
-    print("################################################################")
+    #Get MAP Elements
+    print("##############\n##  List of MAP Elements\n##############")
     print(json.dumps(map_elements, sort_keys=True,indent=4, separators=(',', ': ')))
-
-
     #Get MAP Images
+    print("##############\n##  List of MAP Images\n##############")
     get_floor_images(credentials.dnaspaces_token)
