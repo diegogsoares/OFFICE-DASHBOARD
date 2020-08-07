@@ -284,9 +284,24 @@ Enter a number: 1
 approximated expected output:
 
 ```console
-Expected output
-Expected output
-Expected output
+[
+    {
+        "deviceId": "XXXXXXXXXXXXXXXXXXXXXXXX", 
+        "connectionStatus": "connected", 
+        "Network[1].IPv4.Address": "10.10.10.10", 
+        "Audio.Volume": 50, 
+        "SystemUnit.State.NumberOfActiveCalls": 0, 
+        "SystemUnit.State.NumberOfInProgressCalls": 0, 
+        "Cameras.Camera[1].LightingConditions": "Good", 
+        "RoomAnalytics.AmbientNoise.Level.A": 73, 
+        "RoomAnalytics.PeopleCount.Current": 0, 
+        "RoomAnalytics.PeoplePresence": "No", 
+        "RoomAnalytics.Sound.Level.A": 75, 
+        "Standby.State": "Halfwake", 
+        "SystemUnit.Hardware.Monitoring.Temperature.Status": "Normal"
+    }
+]
+
 ```
 
 #### Testing DNA Spaces Module

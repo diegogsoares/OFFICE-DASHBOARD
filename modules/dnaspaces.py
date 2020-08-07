@@ -129,14 +129,13 @@ if __name__ == "__main__":
     #Get DNA Spaces MAP Elements
     map_elements = get_dnaspaces_elements(credentials.dnaspaces_token)
 
-
     #Prime data
     clean_list = prime_influx(clients_resp.json().get("results"))
     
     #Get Clients
     print("##############\n##  List of Clients\n##############")
-    #for item in clean_list:
-    #    print(json.dumps(item, sort_keys=True,indent=4, separators=(',', ': ')))
+    for item in clean_list:
+        print(json.dumps(item, sort_keys=True,indent=4, separators=(',', ': ')))
 
     #Get Device Types
     print("##############\n##  Summary of Device Types\n##############")
