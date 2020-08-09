@@ -8,6 +8,7 @@ import os, time, datetime,json
 import credentials
 from modules import webex
 from modules import meraki
+from modules import dnaspaces
 from modules import save_data
 
 # Set Global Variables
@@ -31,6 +32,10 @@ class Config(object):
             'id': 'job3',
             'func': 'new-app:collect_meraki_clients_and_camera', 'args': (),
             'trigger': 'interval', 'seconds': 30
+        },{
+            'id': 'job4',
+            'func': 'new-app:collect_dnaspaces', 'args': (),
+            'trigger': 'interval', 'seconds': 30
         }
     ]
     SCHEDULER_API_ENABLED = True
@@ -45,6 +50,22 @@ def collect_webex_devices():
     t2 = datetime.datetime.now()
     #Log Excecution
     print("Webex Devices Info Collected and Saved! - "+str(t2 - t1))
+    return
+#Collect Information from DNA Spaces
+def collect_dnaspaces():
+    t1 = datetime.datetime.now()
+    #Get DNA Spaces Client Information
+    clients_resp,device_types_resp,device_perfloor_resp = get_dnaspaces_clients(credentials.dnaspaces_token)
+    #Get DNA Spaces MAP Elements
+    map_elements = get_dnaspaces_elements(credentials.dnaspaces_token)
+    #Save info from all devices
+    save_data.write_list(clients_resp,"dnaspaces","clients")
+    save_data.write_list(device_types_resp,"dnaspaces","device_types")
+    save_data.write_list(device_perfloor_resp,"dnaspaces","devices_floor")
+    save_data.write_list(map_elements,"dnaspaces","map_elements")
+    t2 = datetime.datetime.now()
+    #Log Excecution
+    print("DNA Spaces Info Collected and Saved! - "+str(t2 - t1))
     return
 #Collect Information from Meraki Dashboard
 def collect_meraki_dashboard():

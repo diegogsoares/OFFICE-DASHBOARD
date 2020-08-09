@@ -59,7 +59,7 @@ Here is how to run the module as standalone.
 This module is responsible for data collection and data translation of Webex xAPI service available on Webex Room Devices. In this project we decided to use WEBEX Cloud xAPI as a broker to talk to the devices, to simplify inventory, authentication and communication to the device.
 
 Within the module there are 2 major functions:
-1. **get_webex_device_details** - Responsible for Collecting information from dvices via WEBEX Cloud.
+1. **get_webex_device_details** - Responsible for Collecting information from devices via WEBEX Cloud.
 2. **get_webex_token** - Responsible for generating a new token to access Webex Cloud API.
 
 For this module to work, you will need:
@@ -80,8 +80,8 @@ Here is how to run the module as standalone.
 This module is responsible for data collection and data translation of DNA Spaces location information and alerts.
 
 Within the module there are 2 major functions:
-1. **  ** - .
-2. **  ** - .
+1. **get_dnaspaces_clients** - Responsible for Collecting Client Location information.
+2. **get_dnaspaces_elements** - Responsible for Collecting Map Elements like Buildings, Floors and Zones.
 
 For this module to work, you will need:
 1. A DNA Spaces API Token
