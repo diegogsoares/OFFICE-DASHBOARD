@@ -55,14 +55,14 @@ def collect_webex_devices():
 def collect_dnaspaces():
     t1 = datetime.datetime.now()
     #Get DNA Spaces Client Information
-    clients_resp,device_types_resp,device_perfloor_resp = get_dnaspaces_clients(credentials.dnaspaces_token)
+    clients_resp,device_types_resp,device_perfloor_resp = dnaspaces.get_dnaspaces_clients(credentials.dnaspaces_token)
     #Get DNA Spaces MAP Elements
-    map_elements = get_dnaspaces_elements(credentials.dnaspaces_token)
+    map_elements = dnaspaces.get_dnaspaces_elements(credentials.dnaspaces_token)
     #Save info from all devices
-    save_data.write_list(clients_resp,"dnaspaces","clients")
-    save_data.write_list(device_types_resp,"dnaspaces","device_types")
-    save_data.write_list(device_perfloor_resp,"dnaspaces","devices_floor")
-    save_data.write_list(map_elements,"dnaspaces","map_elements")
+    save_data.write_list(clients_resp,"clients","dnaspaces")
+    save_data.write_list(device_types_resp,"device_types","dnaspaces")
+    save_data.write_list(device_perfloor_resp,"devices_floor","dnaspaces")
+    save_data.write_list(map_elements,"map_elements","dnaspaces")
     t2 = datetime.datetime.now()
     #Log Excecution
     print("DNA Spaces Info Collected and Saved! - "+str(t2 - t1))
