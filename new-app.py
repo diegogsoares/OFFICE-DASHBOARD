@@ -59,9 +59,9 @@ def collect_dnaspaces():
     #Get DNA Spaces MAP Elements
     map_elements = dnaspaces.get_dnaspaces_elements(credentials.dnaspaces_token)
     #Save info from all devices
-    save_data.write_list(clients_resp,"clients","dnaspaces")
-    save_data.write_list(device_types_resp,"device_types","dnaspaces")
-    save_data.write_list(device_perfloor_resp,"devices_floor","dnaspaces")
+    save_data.write_list(dnaspaces.prime_client(dnaspaces.prime_influx(clients_resp.json().get("results"))),"clients","dnaspaces")
+    save_data.write_list(dnaspaces.prime_influx(device_types_resp.json().get("results")),"device_types","dnaspaces")
+    save_data.write_list(dnaspaces.prime_influx(device_perfloor_resp.json().get("results")),"devices_floor","dnaspaces")
     save_data.write_list(map_elements,"map_elements","dnaspaces")
     t2 = datetime.datetime.now()
     #Log Excecution

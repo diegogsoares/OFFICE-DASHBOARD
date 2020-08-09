@@ -62,6 +62,18 @@ def prime_influx(raw_list):
     return flatten_list
 
 ################################################################
+#### Prime coordiantes on clients
+################################################################
+def prime_client(raw_list):
+    # Adjust Coordinates to float
+    for item in raw_list:
+        item["rawCoordinates_0"] = float(item["rawCoordinates_0"])
+        item["rawCoordinates_1"] = float(item["rawCoordinates_1"])
+        item["coordinates_0"] = float(item["coordinates_0"])
+        item["coordinates_1"] = float(item["coordinates_1"])
+    
+    return raw_list
+################################################################
 #### Get DNA Spaces Clients
 ################################################################
 def get_dnaspaces_clients(credentials):
@@ -130,12 +142,12 @@ if __name__ == "__main__":
     map_elements = get_dnaspaces_elements(credentials.dnaspaces_token)
 
     #Prime data
-    clean_list = prime_influx(clients_resp.json().get("results"))
+    clean_list = prime_client(prime_influx(clients_resp.json().get("results")))
     
     #Get Clients
     print("##############\n##  List of Clients\n##############")
     for item in clean_list:
-        print(json.dumps(item, sort_keys=True,indent=4, separators=(',', ': ')))
+        print(json.dumps(item["coordinates_0"], sort_keys=True,indent=4, separators=(',', ': ')))
 
     #Get Device Types
     print("##############\n##  Summary of Device Types\n##############")

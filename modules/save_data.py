@@ -18,8 +18,8 @@ client = InfluxDBClient(host='localhost', port=8086)
 
 ### Used for Troubleshooting
 #client.drop_database('meraki')
-#client.switch_database('meraki')
-#client.drop_measurement('meraki_location')
+#client.switch_database('dnaspaces')
+#client.drop_measurement('clients')
 
 # List Databases
 dbs = client.get_list_database()
