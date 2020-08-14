@@ -280,7 +280,7 @@ def analyze_snapshot(url):
 ################################################################
 ###    Collect Dashboard Information
 ################################################################
-def find_meraki_dashboard_info(org_id):
+def find_meraki_dashboard(org_id):
     # Set parameter for SDK queries
     params = {"organization_id": org_id}
     # Collect Organization Networks
@@ -333,7 +333,7 @@ def find_meraki_dashboard_info(org_id):
 ################################################################
 ###    Collect Client Information
 ################################################################
-def find_meraki_client_info(org_id):
+def find_meraki_clients(org_id):
     # Set parameter for SDK queries
     params = {"organization_id": org_id}
     # Collect Organization Networks
@@ -367,7 +367,7 @@ def find_meraki_client_info(org_id):
 ################################################################
 ###    Collect MV Sense Information
 ################################################################
-def find_meraki_camera_info(org_id):
+def find_meraki_camera(org_id):
     # Set parameter for SDK queries
     params = {"organization_id": org_id}
     # Set variables
@@ -459,9 +459,10 @@ def save_meraki_location(request,validator):
                 sub_item["apMac"] = item.get("apMac")
                 sub_item["apFloors"] = item.get("apFloors")[0]
         # Return success message
-        return (location_result,"Meraki Location Scanning POST Received",200)
+        return (location_result,validator,200)
     else:
-        return (validator,"Meraki Location POST URL Accessed",200)
+        # Return Validator so Meraki Cloud can validate URL
+        return (validator,validator,200)
 
 ################################################################
 #### MAIN FUNCTION, used only for when you call the file.
@@ -471,11 +472,11 @@ if __name__ == "__main__":
     org_id,option = get_input()
     
     #Get Dashboard info
-    dashboard = find_meraki_dashboard_info(org_id)
+    dashboard = find_meraki_dashboard(org_id)
     #Get Client info
-    client = find_meraki_client_info(org_id)
+    client = find_meraki_clients(org_id)
     #Get Camera info
-    camera = find_meraki_camera_info(org_id)
+    camera = find_meraki_camera(org_id)
 
     #Print Results
     print_result(dashboard,client,camera,option)

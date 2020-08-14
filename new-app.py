@@ -22,26 +22,26 @@ class Config(object):
     JOBS = [
         {
             'id': 'job1',
-            'func': 'new-app:collect_webex_devices', 'args': (),
+            'func': 'new-app:get_webex_devices', 'args': (),
             'trigger': 'interval', 'seconds': 30
         },{
             'id': 'job2',
-            'func': 'new-app:collect_meraki_dashboard', 'args': (),
+            'func': 'new-app:get_meraki_dashboard', 'args': (),
             'trigger': 'interval', 'seconds': 60
         },{
             'id': 'job3',
-            'func': 'new-app:collect_meraki_clients_and_camera', 'args': (),
+            'func': 'new-app:get_meraki_endpoints', 'args': (),
             'trigger': 'interval', 'seconds': 30
         },{
             'id': 'job4',
-            'func': 'new-app:collect_dnaspaces', 'args': (),
+            'func': 'new-app:get_dnaspaces', 'args': (),
             'trigger': 'interval', 'seconds': 30
         }
     ]
     SCHEDULER_API_ENABLED = True
 
 #Collect Information from Webex Devices
-def collect_webex_devices():
+def get_webex_devices():
     t1 = datetime.datetime.now()
     # Find Webex devices and collect info
     devices_result, access_token = webex.get_webex_device_details(credentials.webex_token)
@@ -52,7 +52,7 @@ def collect_webex_devices():
     print("Webex Devices Info Collected and Saved! - "+str(t2 - t1))
     return
 #Collect Information from DNA Spaces
-def collect_dnaspaces():
+def get_dnaspaces():
     t1 = datetime.datetime.now()
     #Get DNA Spaces Client Information
     clients_resp,device_types_resp,device_perfloor_resp = dnaspaces.get_dnaspaces_clients(credentials.dnaspaces_token)
@@ -68,11 +68,11 @@ def collect_dnaspaces():
     print("DNA Spaces Info Collected and Saved! - "+str(t2 - t1))
     return
 #Collect Information from Meraki Dashboard
-def collect_meraki_dashboard():
+def get_meraki_dashboard():
     time.sleep(8)
     t1 = datetime.datetime.now()
     # Collect Meraki Dashboard information
-    dashboard_result = meraki.find_meraki_dashboard_info(credentials.meraki_org_id)
+    dashboard_result = meraki.find_meraki_dashboard(credentials.meraki_org_id)
     #Save information collected
     for key in dashboard_result:
         primed_result = meraki.prime_meraki_data(dashboard_result[key])
@@ -82,10 +82,10 @@ def collect_meraki_dashboard():
     print("Meraki Dashboard Info Collected and Saved! - "+str(t2 - t1))
     return
 #Collect Information from Meraki Connected Devices
-def collect_meraki_clients_and_camera():
+def get_meraki_endpoints():
     t1 = datetime.datetime.now()
     # Collect Meraki Client information
-    clients_result = meraki.find_meraki_client_info(credentials.meraki_org_id)
+    clients_result = meraki.find_meraki_clients(credentials.meraki_org_id)
     #Save information collected
     for key in clients_result:
         primed_result = meraki.prime_meraki_data(clients_result[key])
@@ -96,7 +96,7 @@ def collect_meraki_clients_and_camera():
     #############################################################################
     t1 = datetime.datetime.now()
     # Collect Meraki Camera information
-    cameras_result = meraki.find_meraki_camera_info(credentials.meraki_org_id)
+    cameras_result = meraki.find_meraki_camera(credentials.meraki_org_id)
     #Save information collected
     for key in cameras_result:
         primed_result = meraki.prime_meraki_data(cameras_result[key])
