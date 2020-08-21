@@ -14,11 +14,6 @@ meraki_version = ''
 meraki_secret = ''
 
 ### WEBEX Variables
-webex_user = ''
-webex_pass = ''
-webex_client_id = ''
-webex_client_secret = ''
-webex_redirect_uri = ''
 webex_token = ''
 
 ### DNA_Spaces Variables
