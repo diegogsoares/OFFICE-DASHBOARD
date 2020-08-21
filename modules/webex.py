@@ -1,8 +1,5 @@
 ### Import Needed Libraries
 import sys, os, json,requests
-from selenium.webdriver import Firefox
-from selenium.webdriver.firefox.options import Options
-from urllib import parse
 from benedict import benedict
 
 ### Set proper working directory to import Credentials
