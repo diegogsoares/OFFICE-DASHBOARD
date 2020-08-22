@@ -38,6 +38,12 @@ class Config(object):
             'trigger': 'interval', 'seconds': 30
         }
     ]
+    
+    SCHEDULER_JOB_DEFAULTS = {
+        'coalesce': False,
+        'max_instances': 3
+    }
+    
     SCHEDULER_API_ENABLED = True
 
 #Collect Information from Webex Devices
@@ -161,7 +167,6 @@ def location(validator):
     # Save Meraki Location
     result,message,code = meraki.save_meraki_location(request,validator)
     t2 = datetime.datetime.now()
-    #print(json.dumps(result, sort_keys=True,indent=4, separators=(',', ': ')))
     save_data.write_list(result,"meraki_location","meraki")
     #Log Excecution
     print("Meraki Location Posted. - "+str(t2-t1))
@@ -182,13 +187,6 @@ def alert():
     print("Meraki MV Notification Saved! - "+str(t2-t1))
     #Return result to View Call
     return ("Posted MV Notification.")
-
-# OAUTH View for Webex (Optional)
-@app.route('/oauth', methods=['GET', 'POST'])
-def oauth():
-    #Display back posted info
-    print(request.args)
-    return ("OAUTH PAGE!")
 
 ################################################################
 ###    Start APP

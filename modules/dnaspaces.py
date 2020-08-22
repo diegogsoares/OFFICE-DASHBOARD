@@ -179,9 +179,9 @@ def get_floor_images(credentials,map_elements):
 ################################################################
 if __name__ == "__main__":
     #Get DNA Spaces Clients
-    clients,device_types,device_perfloor = get_dnaspaces_clients(credentials.dnaspaces_token)
+    clients,device_types,device_perfloor = get_clients(credentials.dnaspaces_token)
     #Get DNA Spaces MAP Elements
-    map_elements = get_dnaspaces_elements(credentials.dnaspaces_token)
+    map_elements = get_elements(credentials.dnaspaces_token)
     #Get DNA Spaces MAP Images
     floor_images = get_floor_images(credentials.dnaspaces_token,map_elements)
     
