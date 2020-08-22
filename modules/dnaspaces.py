@@ -107,20 +107,23 @@ def get_image(url,credentials):
 ################################################################
 #### Get DNA Spaces Clients
 ################################################################
-def get_dnaspaces_clients(credentials):
+def get_clients(credentials):
     # Variable Initialiation
     headers = {"Authorization": "Bearer "+credentials, "Content-Type": "application/json"}
     # Get Device Details
     clients_resp = requests.get('https://dnaspaces.io/api/location/v1/clients', headers=headers)
+    primed_clients = prime_client(prime_influx(clients_resp.json().get("results")))
     device_types_resp = requests.get('https://dnaspaces.io/api/location/v1/clients/count?groupBy=deviceType', headers=headers)
+    primed_device_types = prime_influx(device_types_resp.json().get("results"))
     device_perfloor_resp = requests.get('https://dnaspaces.io/api/location/v1/clients/floors', headers=headers)
+    primed_device_perfloor = prime_influx(device_perfloor_resp.json().get("results"))
 
-    return (clients_resp,device_types_resp,device_perfloor_resp)
+    return (primed_clients,primed_device_types,primed_device_perfloor)
 
 ################################################################
 #### Get DNA Spaces MAP Elements
 ################################################################
-def get_dnaspaces_elements(credentials):
+def get_elements(credentials):
     # Variable Initialiation
     headers = {"Authorization": "Bearer "+credentials, "Content-Type": "application/json"}
     # Get MAP Hierarchy
@@ -176,33 +179,28 @@ def get_floor_images(credentials,map_elements):
 ################################################################
 if __name__ == "__main__":
     #Get DNA Spaces Clients
-    clients_resp,device_types_resp,device_perfloor_resp = get_dnaspaces_clients(credentials.dnaspaces_token)
+    clients,device_types,device_perfloor = get_dnaspaces_clients(credentials.dnaspaces_token)
     #Get DNA Spaces MAP Elements
     map_elements = get_dnaspaces_elements(credentials.dnaspaces_token)
     #Get DNA Spaces MAP Images
     floor_images = get_floor_images(credentials.dnaspaces_token,map_elements)
-
-    #Prime data
-    clean_list = prime_client(prime_influx(clients_resp.json().get("results")))
     
-    '''
     ################################################################
     #### Print Results
     ################################################################
     #Print Clients
     print("##############\n##  List of Clients\n##############")
-    for item in clean_list:
-        print(json.dumps(item, sort_keys=True,indent=4, separators=(',', ': ')))
+    print(json.dumps(clients, sort_keys=True,indent=4, separators=(',', ': ')))
     #Print Device Types
     print("##############\n##  Summary of Device Types\n##############")
-    print(json.dumps(prime_influx(device_types_resp.json().get("results")), sort_keys=True,indent=4, separators=(',', ': ')))
+    print(json.dumps(device_types, sort_keys=True,indent=4, separators=(',', ': ')))
     #Print Device Count
-    print("##############\n##  Device Counts\n##############")
-    print(json.dumps(prime_influx(device_perfloor_resp.json().get("results")), sort_keys=True,indent=4, separators=(',', ': ')))
+    print("##############\n##  Device Count per floor\n##############")
+    print(json.dumps(device_perfloor, sort_keys=True,indent=4, separators=(',', ': ')))
     #Print MAP Elements
     print("##############\n##  List of MAP Elements\n##############")
     print(json.dumps(map_elements, sort_keys=True,indent=4, separators=(',', ': ')))
     #Print MAP Images
     print("##############\n##  List of MAP Images\n##############")
     print(json.dumps(floor_images, sort_keys=True,indent=4, separators=(',', ': ')))
-    '''
+

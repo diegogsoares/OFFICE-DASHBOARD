@@ -55,15 +55,15 @@ def get_webex_devices():
 def get_dnaspaces():
     t1 = datetime.datetime.now()
     #Get DNA Spaces Client Information
-    clients_resp,device_types_resp,device_perfloor_resp = dnaspaces.get_dnaspaces_clients(credentials.dnaspaces_token)
+    clients,device_types,device_perfloor = dnaspaces.get_clients(credentials.dnaspaces_token)
     #Get DNA Spaces MAP Elements
-    map_elements = dnaspaces.get_dnaspaces_elements(credentials.dnaspaces_token)
+    map_elements = dnaspaces.get_elements(credentials.dnaspaces_token)
     #Get DNA Spaces MAP Images
     floor_images = dnaspaces.get_floor_images(credentials.dnaspaces_token,map_elements)
     #Save info Collected
-    save_data.write_list(dnaspaces.prime_client(dnaspaces.prime_influx(clients_resp.json().get("results"))),"clients","dnaspaces")
-    save_data.write_list(dnaspaces.prime_influx(device_types_resp.json().get("results")),"device_types","dnaspaces")
-    save_data.write_list(dnaspaces.prime_influx(device_perfloor_resp.json().get("results")),"devices_floor","dnaspaces")
+    save_data.write_list(clients,"clients","dnaspaces")
+    save_data.write_list(device_types,"device_types","dnaspaces")
+    save_data.write_list(device_perfloor,"devices_floor","dnaspaces")
     save_data.write_list(map_elements,"map_elements","dnaspaces")
     save_data.write_list(floor_images,"floor_images","dnaspaces")
 
