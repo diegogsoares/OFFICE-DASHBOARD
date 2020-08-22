@@ -146,7 +146,10 @@ def image(image_file):
 @app.route('/dnaspaces-notification/', methods=['GET', 'POST'])
 def dnaspaces_notification():
     if request.method == 'POST':
-        print(json.dumps(request.json, sort_keys=True,indent=4, separators=(',', ': ')))
+        t1 = datetime.datetime.now()
+        save_data.write_list(request.json,"notifications","dnaspaces")
+        t2 = datetime.datetime.now()
+        print("DNA Spaces Notification Posted. - "+str(t2-t1))
         return ("DNA Spaces Notification Posted.")
     
     return ("DNA Spaces Notification URL.")
@@ -161,7 +164,7 @@ def location(validator):
     #print(json.dumps(result, sort_keys=True,indent=4, separators=(',', ': ')))
     save_data.write_list(result,"meraki_location","meraki")
     #Log Excecution
-    print(message+" - "+str(t2-t1))
+    print("Meraki Location Posted. - "+str(t2-t1))
     #Return result to View Call
     return (message,code)
 
