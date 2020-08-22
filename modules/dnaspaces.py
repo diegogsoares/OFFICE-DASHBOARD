@@ -162,12 +162,12 @@ def get_floor_images(credentials,map_elements):
             item["image_url"] = str("https://dnaspaces.io/api/location/v1/map/images/floor/"+image_name)
             #Append JSON Structure to response
             obj.append(item)
-            #Save Image on images folder
-            image = get_image(item["image_url"],credentials)
-            print (os.path.join(imagedir, item["floor_id"]+".png"))
-            f = open(os.path.join(imagedir, item["floor_id"]+".png"), "wb")
-            f.write(image.content)
-            f.close()
+            #Save Image on images folder if it does not exist
+            if not os.path.isfile(os.path.join(imagedir, item["floor_id"]+".png")):
+                image = get_image(item["image_url"],credentials)
+                f = open(os.path.join(imagedir, item["floor_id"]+".png"), "wb")
+                f.write(image.content)
+                f.close()
 
     return (obj)
 
@@ -185,6 +185,7 @@ if __name__ == "__main__":
     #Prime data
     clean_list = prime_client(prime_influx(clients_resp.json().get("results")))
     
+    '''
     ################################################################
     #### Print Results
     ################################################################
@@ -204,3 +205,4 @@ if __name__ == "__main__":
     #Print MAP Images
     print("##############\n##  List of MAP Images\n##############")
     print(json.dumps(floor_images, sort_keys=True,indent=4, separators=(',', ': ')))
+    '''

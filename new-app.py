@@ -58,11 +58,15 @@ def get_dnaspaces():
     clients_resp,device_types_resp,device_perfloor_resp = dnaspaces.get_dnaspaces_clients(credentials.dnaspaces_token)
     #Get DNA Spaces MAP Elements
     map_elements = dnaspaces.get_dnaspaces_elements(credentials.dnaspaces_token)
-    #Save info from all devices
+    #Get DNA Spaces MAP Images
+    floor_images = dnaspaces.get_floor_images(credentials.dnaspaces_token,map_elements)
+    #Save info Collected
     save_data.write_list(dnaspaces.prime_client(dnaspaces.prime_influx(clients_resp.json().get("results"))),"clients","dnaspaces")
     save_data.write_list(dnaspaces.prime_influx(device_types_resp.json().get("results")),"device_types","dnaspaces")
     save_data.write_list(dnaspaces.prime_influx(device_perfloor_resp.json().get("results")),"devices_floor","dnaspaces")
     save_data.write_list(map_elements,"map_elements","dnaspaces")
+    save_data.write_list(floor_images,"floor_images","dnaspaces")
+
     t2 = datetime.datetime.now()
     #Log Excecution
     print("DNA Spaces Info Collected and Saved! - "+str(t2 - t1))
