@@ -1,11 +1,19 @@
 ### Import Needed Libraries
-import sys, requests, json, collections
+import sys, os, time, requests, json, collections
+
+### Set Correct Directories
+basedir = os.path.abspath(os.path.dirname(__file__))
+imagedir = os.path.normpath(os.path.join(basedir, "../images/"))
 
 ### Set proper working directory to import Credentials
 sys.path.append('.')
+
 ### Import Credential Files
 import credentials
 
+#######################################################################################
+########   Data Translation Layer
+#######################################################################################
 ################################################################
 #### Flatten JSON
 ################################################################
@@ -73,6 +81,29 @@ def prime_client(raw_list):
         item["coordinates_1"] = float(item["coordinates_1"])
     
     return raw_list
+
+#######################################################################################
+########   Data Collection Layer
+#######################################################################################
+################################################################
+###    GET Image
+################################################################
+def get_image(url,credentials):
+    # Set Variables
+    headers = {"Authorization": "Bearer "+credentials, "Content-Type": "application/json"}
+    response_code = count = 0
+    # Get Image from URL
+    image = requests.get(url, headers=headers, allow_redirects=True)
+    response_code = image.status_code
+    # Check if images was retrieved and retry if needed.
+    while response_code != 200 and count <3:
+        image = requests.get(url, headers=headers, allow_redirects=True)
+        response_code = image.status_code
+        count += 1
+        time.sleep(1)
+
+    return image
+
 ################################################################
 #### Get DNA Spaces Clients
 ################################################################
@@ -111,26 +142,34 @@ def get_dnaspaces_elements(credentials):
     return obj
 
 ################################################################
-#### Get DNA Spaces MAP Elements
+#### Get DNA Spaces MAP Images
 ################################################################
-def get_floor_images(credentials):
-    # Variable Initialiation
+def get_floor_images(credentials,map_elements):
+    # Variable Initialization
     headers = {"Authorization": "Bearer "+credentials, "Content-Type": "application/json"}
-    # Get MAP Elements
-    map_elements = get_dnaspaces_elements(credentials)
     # GET images for floors
+    obj = []
     for i in map_elements:
         if i["level"] == "FLOOR":
+            item = {}
             element_resp = requests.get('https://dnaspaces.io/api/location/v1/map/elements/'+i["id"], headers=headers)
             image_name = element_resp.json().get("map").get("details").get("image").get("imageName")
-            print("################################################################")
-            print("Name : "+str(i["name"]))
-            print("Hierarchy : "+str(element_resp.json().get("map").get("relationshipData").get("ancestors")))
-            print("Image Name : "+str(image_name))
-            
-            #image = requests.get('https://dnaspaces.io/api/location/v1/map/images/floor/'+image_name, headers=headers)
+            # Build JSON Structure for Floor Image
+            item["floor_name"] = str(i.get("name"))
+            item["floor_id"] = str(i.get("id"))
+            item["hierarchy"] = str(element_resp.json().get("map").get("relationshipData").get("ancestors"))
+            item["image_name"] = str(image_name)
+            item["image_url"] = str("https://dnaspaces.io/api/location/v1/map/images/floor/"+image_name)
+            #Append JSON Structure to response
+            obj.append(item)
+            #Save Image on images folder
+            image = get_image(item["image_url"],credentials)
+            print (os.path.join(imagedir, item["floor_id"]+".png"))
+            f = open(os.path.join(imagedir, item["floor_id"]+".png"), "wb")
+            f.write(image.content)
+            f.close()
 
-    return
+    return (obj)
 
 ################################################################
 #### MAIN FUNCTION, used only for when you call the file.
@@ -140,24 +179,28 @@ if __name__ == "__main__":
     clients_resp,device_types_resp,device_perfloor_resp = get_dnaspaces_clients(credentials.dnaspaces_token)
     #Get DNA Spaces MAP Elements
     map_elements = get_dnaspaces_elements(credentials.dnaspaces_token)
+    #Get DNA Spaces MAP Images
+    floor_images = get_floor_images(credentials.dnaspaces_token,map_elements)
 
     #Prime data
     clean_list = prime_client(prime_influx(clients_resp.json().get("results")))
     
-    #Get Clients
+    ################################################################
+    #### Print Results
+    ################################################################
+    #Print Clients
     print("##############\n##  List of Clients\n##############")
     for item in clean_list:
-        print(json.dumps(item["coordinates_0"], sort_keys=True,indent=4, separators=(',', ': ')))
-
-    #Get Device Types
+        print(json.dumps(item, sort_keys=True,indent=4, separators=(',', ': ')))
+    #Print Device Types
     print("##############\n##  Summary of Device Types\n##############")
     print(json.dumps(prime_influx(device_types_resp.json().get("results")), sort_keys=True,indent=4, separators=(',', ': ')))
-    #Get Device Count
+    #Print Device Count
     print("##############\n##  Device Counts\n##############")
     print(json.dumps(prime_influx(device_perfloor_resp.json().get("results")), sort_keys=True,indent=4, separators=(',', ': ')))
-    #Get MAP Elements
+    #Print MAP Elements
     print("##############\n##  List of MAP Elements\n##############")
     print(json.dumps(map_elements, sort_keys=True,indent=4, separators=(',', ': ')))
-    #Get MAP Images
+    #Print MAP Images
     print("##############\n##  List of MAP Images\n##############")
-    get_floor_images(credentials.dnaspaces_token)
+    print(json.dumps(floor_images, sort_keys=True,indent=4, separators=(',', ': ')))
