@@ -176,17 +176,21 @@ def location(validator):
 # MV Alert POST URL
 @app.route('/mvalert', methods=['GET', 'POST'])
 def alert():
-    t1 = datetime.datetime.now()
-    # Analyze MV Camera Notification
-    result = meraki.analyze_camera_alert(request.json)
-    # Save Analysis result
-    for key in result:
-        save_data.write_list(result[key],key,"meraki")
-    t2 = datetime.datetime.now()    
-    #Log Excecution
-    print("Meraki MV Notification Saved! - "+str(t2-t1))
-    #Return result to View Call
-    return ("Posted MV Notification.")
+    if request.method == 'POST':
+        t1 = datetime.datetime.now()
+        # Analyze MV Camera Notification
+        result = meraki.analyze_camera_alert(request.json)
+        # Save Analysis result
+        for key in result:
+            save_data.write_list(result[key],key,"meraki")
+        t2 = datetime.datetime.now()    
+        #Log Excecution
+        print("Meraki MV Notification Saved! - "+str(t2-t1))
+        #Return result to View Call
+        return ("Posted MV Notification.")
+    else:
+        print("Meraki MV URL Accessed.")
+        return ("Meraki MV URL Accessed.") 
 
 ################################################################
 ###    Start APP

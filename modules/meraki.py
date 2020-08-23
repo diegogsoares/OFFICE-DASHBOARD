@@ -420,12 +420,17 @@ def find_meraki_camera(org_id):
 ################################################################
 def analyze_camera_alert(data):
     # If using Motion recap
-    if data.get("alertData").get("imageUrl"):
-        result = analyze_snapshot(data.get("alertData").get("imageUrl"))
-    else:
-        print("No Alert Data.")
-    # Return Analysis Result
-    return (result)
+    try:
+        if data.get("alertData").get("imageUrl"):
+            print("YES")
+            result = analyze_snapshot(data.get("alertData").get("imageUrl"))
+        else:
+            print("No Alert Data.")
+        # Return Analysis Result
+        return (result)
+    except:
+        print("Error with Post.")
+        return({"rekognition_face": "[]","rekognition_objects": "[]"})
 
 ################################################################
 ###    Validate Location API Data and Save
